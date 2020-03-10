@@ -34,26 +34,24 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
-@WebServlet("/data2")
-public class DataServlet extends HttpServlet {
-    
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-//ArrayList<String> arrli = new ArrayList<String>();
-//Gson gson = new Gson();
-//String json =  gson.toJson(arrli);
- DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-Query query = new Query("comment");
-PreparedQuery results = datastore.prepare(query);
-for (Entity entity : results.asIterable()) {
-    response.setContentType("text/html;");
-    //response.getWriter().println( (String)entity.getProperty("name"));
-    //response.getWriter().println("<p>Color: " + color + "</p>");
-    response.getWriter().println( (String) entity.getProperty("comment") );
-    response.getWriter().println(" ");
-  }
-  System.out.println(response);
-  //response.sendRedirect("/index.html");
+@WebServlet("/data")
+public class DataServlet_copy extends HttpServlet {
+     
+ArrayList<String> arrli = new ArrayList<String>();
+public void doPost(HttpServletRequest request, HttpServletResponse response)throws IOException{
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    String comment = request.getParameter("comments");
+    String name = request.getParameter("name");
+    System.out.print(comment);
+    System.out.print(name);
+  arrli.add(comment);
+  Entity commentEntity = new Entity("comment");
+ commentEntity.setProperty("name", name);
+    commentEntity.setProperty("comment", comment);
+    datastore.put(commentEntity);
+  //response.setContentType("text/html");
+      //response.getWriter().println(comment);
+      response.sendRedirect("/index.html");
 }
-
+  
 }

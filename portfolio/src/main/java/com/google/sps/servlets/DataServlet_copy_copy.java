@@ -13,6 +13,9 @@
 // limitations under the License.
 
 package com.google.sps.servlets;
+import com.google.cloud.language.v1.Document;
+import com.google.cloud.language.v1.LanguageServiceClient;
+import com.google.cloud.language.v1.Sentiment;
 import java.io.*; 
 import java.lang.*; 
 import java.io.IOException;
@@ -34,26 +37,27 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
-@WebServlet("/data2")
-public class DataServlet extends HttpServlet {
-    
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-//ArrayList<String> arrli = new ArrayList<String>();
-//Gson gson = new Gson();
-//String json =  gson.toJson(arrli);
- DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-Query query = new Query("comment");
-PreparedQuery results = datastore.prepare(query);
-for (Entity entity : results.asIterable()) {
-    response.setContentType("text/html;");
-    //response.getWriter().println( (String)entity.getProperty("name"));
-    //response.getWriter().println("<p>Color: " + color + "</p>");
-    response.getWriter().println( (String) entity.getProperty("comment") );
-    response.getWriter().println(" ");
-  }
-  System.out.println(response);
-  //response.sendRedirect("/index.html");
-}
+@WebServlet("/sentiment")
+public class DataServlet_copy_copy extends HttpServlet {
+     
+ArrayList<String> arrli = new ArrayList<String>();
+public void doPost(HttpServletRequest request, HttpServletResponse response)throws IOException{
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    String comment = request.getParameter("comments");
 
+    System.out.print(comment);
+
+  Document doc =
+    Document.newBuilder().setContent(comment).setType(Document.Type.PLAIN_TEXT).build();
+LanguageServiceClient languageService = LanguageServiceClient.create();
+Sentiment sentiment = languageService.analyzeSentiment(doc).getDocumentSentiment();
+float score = sentiment.getScore();
+languageService.close();
+  response.setContentType("text/html;");
+    response.getWriter().println("<h1>Sentiment Analysis</h1>");
+    response.getWriter().println("<p>You entered: " + comment + "</p>");
+    response.getWriter().println("<p>Sentiment analysis score: " + score + "</p>");
+      response.sendRedirect("/index.html");
+}
+  
 }
